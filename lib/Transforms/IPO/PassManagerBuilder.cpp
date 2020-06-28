@@ -485,6 +485,9 @@ void PassManagerBuilder::populateModulePassManager(
 
   MPM.add(createSplitBasicBlock(Split));
   MPM.add(createBogus(BogusControlFlow));
+  #if LLVM_VERSION_MAJOR >= 9
+    MPM.add(createLowerSwitchPass());
+  #endif
   MPM.add(createFlattening(Flattening));
   MPM.add(createStringObfuscation(StringObf));
     
