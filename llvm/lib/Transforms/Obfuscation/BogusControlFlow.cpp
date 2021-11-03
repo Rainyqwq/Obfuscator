@@ -623,8 +623,8 @@ struct BogusControlFlow : public FunctionPass {
     for (std::vector<Instruction *>::iterator i = toEdit.begin();
          i != toEdit.end(); ++i) {
       // if y < 10 || x*(x+1) % 2 == 0
-      opX = new LoadInst((Value *)x, "", (*i));
-      opY = new LoadInst((Value *)y, "", (*i));
+      opX = new LoadInst(x->getType()->getElementType(), (Value *)x, "", (*i));
+      opY = new LoadInst(x->getType()->getElementType(), (Value *)y, "", (*i));
 
       op = BinaryOperator::Create(
           Instruction::Sub, (Value *)opX,

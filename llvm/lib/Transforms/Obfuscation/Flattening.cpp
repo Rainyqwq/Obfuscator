@@ -14,6 +14,7 @@
 #include "llvm/Transforms/Obfuscation/Flattening.h"
 #include "llvm/Transforms/Obfuscation/CryptoUtils.h"
 #include "llvm/Transforms/Utils.h"
+#include "llvm/InitializePasses.h"
 
 #define DEBUG_TYPE "flattening"
 
@@ -130,7 +131,7 @@ bool Flattening::flatten(Function *f) {
   loopEntry = BasicBlock::Create(f->getContext(), "loopEntry", f, insert);
   loopEnd = BasicBlock::Create(f->getContext(), "loopEnd", f, insert);
 
-  load = new LoadInst(switchVar, "switchVar", loopEntry);
+  load = new LoadInst(switchVar->getType()->getElementType(), switchVar, "switchVar", loopEntry);
 
   // Move first BB on top
   insert->moveBefore(loopEntry);
