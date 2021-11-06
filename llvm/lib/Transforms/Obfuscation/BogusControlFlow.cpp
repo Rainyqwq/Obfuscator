@@ -409,6 +409,7 @@ struct BogusControlFlow : public FunctionPass {
       if (i->isBinaryOp()) { // binary instructions
         unsigned opcode = i->getOpcode();
         BinaryOperator *op, *op1 = NULL;
+        UnaryOperator *op2;
         Twine *var = new Twine("_");
         // treat differently float or int
         // Binary int
@@ -452,9 +453,9 @@ struct BogusControlFlow : public FunctionPass {
             case 0:                                    // do nothing
               break;
             case 1:
-              op = BinaryOperator::CreateFNeg(i->getOperand(0), *var, &*i);
-              op1 = BinaryOperator::Create(Instruction::FAdd, op,
-                                           i->getOperand(1), "gen", &*i);
+              op2 = UnaryOperator::CreateFNeg(i->getOperand(0),*var,&*i);
+              op1 = BinaryOperator::Create(Instruction::FAdd,op2,
+                            i->getOperand(1),"gen",&*i);
               break;
             case 2:
               op = BinaryOperator::Create(Instruction::FSub, i->getOperand(0),
@@ -623,8 +624,8 @@ struct BogusControlFlow : public FunctionPass {
     for (std::vector<Instruction *>::iterator i = toEdit.begin();
          i != toEdit.end(); ++i) {
       // if y < 10 || x*(x+1) % 2 == 0
-      opX = new LoadInst((Value *)x, "", (*i));
-      opY = new LoadInst((Value *)y, "", (*i));
+      opX = new LoadInst(x->getType()->getElementType(), (Value *)x, "", (*i));
+      opY = new LoadInst(y->getType()->getElementType(), (Value *)y, "", (*i));
 
       op = BinaryOperator::Create(
           Instruction::Sub, (Value *)opX,

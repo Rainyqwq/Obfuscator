@@ -217,6 +217,7 @@ void Substitution::addNeg(BinaryOperator *bo) {
 // Implementation of a = -(-b + (-c))
 void Substitution::addDoubleNeg(BinaryOperator *bo) {
   BinaryOperator *op, *op2 = NULL;
+  UnaryOperator *op3, *op4; 
 
   if (bo->getOpcode() == Instruction::Add) {
     op = BinaryOperator::CreateNeg(bo->getOperand(0), "", bo);
@@ -224,17 +225,21 @@ void Substitution::addDoubleNeg(BinaryOperator *bo) {
     op = BinaryOperator::Create(Instruction::Add, op, op2, "", bo);
     op = BinaryOperator::CreateNeg(op, "", bo);
 
+    bo->replaceAllUsesWith(op);
     // Check signed wrap
     // op->setHasNoSignedWrap(bo->hasNoSignedWrap());
     // op->setHasNoUnsignedWrap(bo->hasNoUnsignedWrap());
+
   } else {
-    op = BinaryOperator::CreateFNeg(bo->getOperand(0), "", bo);
-    op2 = BinaryOperator::CreateFNeg(bo->getOperand(1), "", bo);
-    op = BinaryOperator::Create(Instruction::FAdd, op, op2, "", bo);
-    op = BinaryOperator::CreateFNeg(op, "", bo);
+    op3 = UnaryOperator::CreateFNeg(bo->getOperand(0), "", bo); 
+    op4 = UnaryOperator::CreateFNeg(bo->getOperand(1), "", bo); 
+    op = BinaryOperator::Create(Instruction::FAdd, op3, op4, "", bo); 
+    op3 = UnaryOperator::CreateFNeg(op, "", bo); 
+
+    bo->replaceAllUsesWith(op3); 
+
   }
 
-  bo->replaceAllUsesWith(op);
 }
 
 // Implementation of  r = rand (); a = b + r; a = a + c; a = a - r
@@ -310,9 +315,8 @@ void Substitution::subNeg(BinaryOperator *bo) {
     // op->setHasNoSignedWrap(bo->hasNoSignedWrap());
     // op->setHasNoUnsignedWrap(bo->hasNoUnsignedWrap());
   } else {
-    op = BinaryOperator::CreateFNeg(bo->getOperand(1), "", bo);
-    op = BinaryOperator::Create(Instruction::FAdd, bo->getOperand(0), op, "",
-                                bo);
+    auto op1 = UnaryOperator::CreateFNeg(bo->getOperand(1), "", bo); 
+    op = BinaryOperator::Create(Instruction::FAdd, bo->getOperand(0), op1, "", bo); 
   }
 
   bo->replaceAllUsesWith(op);

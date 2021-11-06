@@ -14,6 +14,7 @@
 #include "llvm/Transforms/Obfuscation/Utils.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Transforms/Utils/ModuleUtils.h"
+#include "llvm/IR/Instructions.h"
 
 using namespace llvm;
 
@@ -176,13 +177,13 @@ namespace llvm {
                                 Value *const_key=builder.getInt8(key);
                                 Value *GEP=builder.CreateGEP(gvar,ArrayRef<Value*>(indexList, 2),"arrayIdx");
                                 LoadInst *loadElement=builder.CreateLoad(GEP,false);
-                                loadElement->setAlignment(1);
+                                loadElement->setAlignment(Align(1));
                                 //errs()<<"Type: "<<*loadElement<<"\n";
                                 //CastInst* extended = new ZExtInst(const_key, loadElement->getType(), "extended", for_body);
                                 //Value* extended = builder.CreateZExtOrBitCast(const_key, loadElement->getType(),"extended");
                                 Value *Xor = builder.CreateXor(loadElement,const_key,"xor");
                                 StoreInst *Store = builder.CreateStore(Xor, GEP,false);
-                                Store->setAlignment(1);
+                                Store->setAlignment(Align(1));
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                 Value *stepValue = builder.getInt32(1);

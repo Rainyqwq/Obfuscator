@@ -159,6 +159,7 @@ void initializeFinalizeMachineBundlesPass(PassRegistry&);
 void initializeFixIrreduciblePass(PassRegistry &);
 void initializeFixupStatepointCallerSavedPass(PassRegistry&);
 void initializeFlattenCFGPassPass(PassRegistry&);
+void initializeFlatteningPass(PassRegistry&);
 void initializeFloat2IntLegacyPassPass(PassRegistry&);
 void initializeForceFunctionAttrsLegacyPassPass(PassRegistry&);
 void initializeForwardControlFlowIntegrityPass(PassRegistry&);
