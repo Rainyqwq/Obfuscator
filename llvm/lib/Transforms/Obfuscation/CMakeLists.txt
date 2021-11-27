@@ -1,4 +1,4 @@
-add_llvm_library(LLVMObfuscation
+add_llvm_component_library(LLVMObfuscation
   CryptoUtils.cpp
   Substitution.cpp
   StringObfuscation.cpp
