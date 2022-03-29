@@ -102,6 +102,7 @@ bool Flattening::flatten(Function *f) {
     br = cast<BranchInst>(insert->getTerminator());
   }
 
+  BasicBlock *zeroBB = NULL;
   if ((br != NULL && br->isConditional()) ||
       insert->getTerminator()->getNumSuccessors() > 1) {
     BasicBlock::iterator i = insert->end();
@@ -114,7 +115,10 @@ bool Flattening::flatten(Function *f) {
     BasicBlock *tmpBB = insert->splitBasicBlock(i, "first");
     origBB.insert(origBB.begin(), tmpBB);
   }
-
+  else if (br != NULL && insert->getTerminator()->getNumSuccessors() == 1) {
+    // Record the first BB branch to
+    zeroBB = insert->getTerminator()->getSuccessor(0);
+  }
   // Remove jump
   insert->getTerminator()->eraseFromParent();
 
@@ -165,7 +169,12 @@ bool Flattening::flatten(Function *f) {
     numCase = cast<ConstantInt>(ConstantInt::get(
         switchI->getCondition()->getType(),
         llvm::cryptoutils->scramble32(switchI->getNumCases(), scrambling_key)));
-    switchI->addCase(numCase, i);
+    if (zeroBB && zeroBB != i) {
+      switchI->addCase(numCase, zeroBB);
+      zeroBB = NULL;
+    } else {
+      switchI->addCase(numCase, i);
+    }
   }
 
   // Recalculate switchVar
