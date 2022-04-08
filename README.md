@@ -1,7 +1,5 @@
 Please have a look at the [wiki](https://github.com/heroims/obfuscator/wiki)!
 
-Current version: [LLVM-4.0](https://github.com/heroims/obfuscator/tree/llvm-4.0)
-
 You can cite Obfuscator-LLVM using the following Bibtex entry:
 
 ```
@@ -15,4 +13,12 @@ You can cite Obfuscator-LLVM using the following Bibtex entry:
   pages={3--9},
   doi={10.1109/SPRO.2015.10},
 }
+```
+
+LLVM14 and Later
+```
+wget https://heroims.github.io/obfuscator/LegacyPass/ollvm14.patch
+git clone -b release/14.x git@github.com:llvm/llvm-project.git
+cd llvm-project
+git apply ../ollvm14.patch
 ```
