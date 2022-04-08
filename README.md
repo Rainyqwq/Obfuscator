@@ -1,7 +1,15 @@
 
 ## LLVM14 and Later
+### LegacyPass
 ```
 wget https://heroims.github.io/obfuscator/LegacyPass/ollvm14.patch
+git clone -b release/14.x git@github.com:llvm/llvm-project.git
+cd llvm-project
+git apply ../ollvm14.patch
+```
+### NewPass
+```
+wget https://heroims.github.io/obfuscator/NewPass/ollvm14.patch
 git clone -b release/14.x git@github.com:llvm/llvm-project.git
 cd llvm-project
 git apply ../ollvm14.patch
