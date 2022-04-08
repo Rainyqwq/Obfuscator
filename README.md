@@ -1,4 +1,13 @@
-Please have a look at the [wiki](https://github.com/heroims/obfuscator/wiki)!
+
+## LLVM14 and Later
+```
+wget https://heroims.github.io/obfuscator/LegacyPass/ollvm14.patch
+git clone -b release/14.x git@github.com:llvm/llvm-project.git
+cd llvm-project
+git apply ../ollvm14.patch
+```
+
+## Please have a look at the [wiki](https://github.com/heroims/obfuscator/wiki)!
 
 You can cite Obfuscator-LLVM using the following Bibtex entry:
 
@@ -15,10 +24,4 @@ You can cite Obfuscator-LLVM using the following Bibtex entry:
 }
 ```
 
-LLVM14 and Later
-```
-wget https://heroims.github.io/obfuscator/LegacyPass/ollvm14.patch
-git clone -b release/14.x git@github.com:llvm/llvm-project.git
-cd llvm-project
-git apply ../ollvm14.patch
-```
+
