@@ -14,6 +14,11 @@ git clone -b release/14.x git@github.com:llvm/llvm-project.git
 cd llvm-project
 git apply ../ollvm14.patch
 ```
+### Resolve Conflict
+```
+git apply --reject --ignore-whitespace ../ollvm14.patch
+```
+And then follow the .rej prompts to modify
 
 ## Please have a look at the [wiki](https://github.com/heroims/obfuscator/wiki)!
 
