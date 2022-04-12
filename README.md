@@ -1,5 +1,11 @@
 
 ## LLVM14 and Later
+NDK Clang: https://android.googlesource.com/toolchain/llvm-project
+
+Apple Clang: https://github.com/apple/llvm-project
+
+Normal: https://github.com/llvm/llvm-project
+
 ### LegacyPass
 ```
 wget https://heroims.github.io/obfuscator/LegacyPass/ollvm14.patch
