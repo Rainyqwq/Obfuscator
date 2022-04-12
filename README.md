@@ -1,10 +1,10 @@
 
 ## LLVM14 and Later
-NDK Clang: https://android.googlesource.com/toolchain/llvm-project
+NDK LLVM: https://android.googlesource.com/toolchain/llvm-project
 
-Apple Clang: https://github.com/apple/llvm-project
+Apple LLVM: https://github.com/apple/llvm-project
 
-Normal: https://github.com/llvm/llvm-project
+Normal LLVM: https://github.com/llvm/llvm-project
 
 ### LegacyPass
 ```
