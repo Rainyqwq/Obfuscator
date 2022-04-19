@@ -2470,10 +2470,10 @@ index 000000000000..baa49168d6f6
 +}
 diff --git a/llvm/lib/Transforms/Obfuscation/Flattening.cpp b/llvm/lib/Transforms/Obfuscation/Flattening.cpp
 new file mode 100644
-index 000000000000..7cbb79cda654
+index 000000000000..d03a0be28446
 --- /dev/null
 +++ b/llvm/lib/Transforms/Obfuscation/Flattening.cpp
-@@ -0,0 +1,260 @@
+@@ -0,0 +1,254 @@
 +//===- Flattening.cpp - Flattening Obfuscation pass------------------------===//
 +//
 +//                     The LLVM Compiler Infrastructure
@@ -2553,10 +2553,15 @@ index 000000000000..7cbb79cda654
 +  // Save all original BB
 +  for (Function::iterator i = f->begin(); i != f->end(); ++i) {
 +    BasicBlock *tmp = &*i;
++    if (tmp->isEHPad() || tmp->isLandingPad()) {
++          errs()<<f->getName()<<" Contains Exception Handing Instructions and is unsupported for flattening in the open-source version of Hikari.\n";
++          return false;
++    }
++    
 +    origBB.push_back(tmp);
 +
 +    BasicBlock *bb = &*i;
-+    if (isa<InvokeInst>(bb->getTerminator())) {
++    if (!isa<BranchInst>(bb->getTerminator()) && !isa<ReturnInst>(bb->getTerminator())) {
 +      return false;
 +    }
 +  }
@@ -2579,7 +2584,6 @@ index 000000000000..7cbb79cda654
 +    br = cast<BranchInst>(insert->getTerminator());
 +  }
 +
-+  BasicBlock *zeroBB = NULL;
 +  if ((br != NULL && br->isConditional()) ||
 +      insert->getTerminator()->getNumSuccessors() > 1) {
 +    BasicBlock::iterator i = insert->end();
@@ -2591,10 +2595,6 @@ index 000000000000..7cbb79cda654
 +
 +    BasicBlock *tmpBB = insert->splitBasicBlock(i, "first");
 +    origBB.insert(origBB.begin(), tmpBB);
-+  }
-+  else if (br != NULL && insert->getTerminator()->getNumSuccessors() == 1) {
-+    // Record the first BB branch to
-+    zeroBB = insert->getTerminator()->getSuccessor(0);
 +  }
 +
 +  // Remove jump
@@ -2647,14 +2647,8 @@ index 000000000000..7cbb79cda654
 +    numCase = cast<ConstantInt>(ConstantInt::get(
 +        switchI->getCondition()->getType(),
 +        llvm::cryptoutils->scramble32(switchI->getNumCases(), scrambling_key)));
-+    if (zeroBB && zeroBB != i) {
-+        switchI->addCase(numCase, zeroBB);
-+        zeroBB = NULL;
-+    }
-+    else {
-+        switchI->addCase(numCase, i);
-+    }
 +
++    switchI->addCase(numCase, i);
 +  }
 +
 +  // Recalculate switchVar
@@ -2817,10 +2811,10 @@ index 000000000000..0a6bf1ddcc42
 +
 diff --git a/llvm/lib/Transforms/Obfuscation/SplitBasicBlocks.cpp b/llvm/lib/Transforms/Obfuscation/SplitBasicBlocks.cpp
 new file mode 100644
-index 000000000000..6da8b5b72faf
+index 000000000000..46eeaa04bdd3
 --- /dev/null
 +++ b/llvm/lib/Transforms/Obfuscation/SplitBasicBlocks.cpp
-@@ -0,0 +1,139 @@
+@@ -0,0 +1,140 @@
 +//===- SplitBasicBlock.cpp - SplitBasicBlokc Obfuscation pass--------------===//
 +//
 +//                     The LLVM Compiler Infrastructure
@@ -2892,7 +2886,6 @@ index 000000000000..6da8b5b72faf
 +
 +void SplitBasicBlock::split(Function *f) {
 +  std::vector<BasicBlock *> origBB;
-+  int splitN = SplitNum;
 +
 +  // Save all basic blocks
 +  for (Function::iterator I = f->begin(), IE = f->end(); I != IE; ++I) {
@@ -2903,6 +2896,7 @@ index 000000000000..6da8b5b72faf
 +                                           IE = origBB.end();
 +       I != IE; ++I) {
 +    BasicBlock *curr = *I;
++    int splitN = SplitNum;
 +
 +    // No need to split a 1 inst bb
 +    // Or ones containing a PHI node
@@ -2911,7 +2905,7 @@ index 000000000000..6da8b5b72faf
 +    }
 +
 +    // Check splitN and current BB size
-+    if ((size_t)splitN > curr->size()) {
++    if ((size_t)splitN >= curr->size()) {
 +      splitN = curr->size() - 1;
 +    }
 +
@@ -2932,12 +2926,13 @@ index 000000000000..6da8b5b72faf
 +    BasicBlock *toSplit = curr;
 +    int last = 0;
 +    for (int i = 0; i < splitN; ++i) {
++      if (toSplit->size() < 2)
++        continue;
 +      for (int j = 0; j < test[i] - last; ++j) {
 +        ++it;
 +      }
 +      last = test[i];
-+      if (toSplit->size() < 2)
-+        continue;
++
 +      toSplit = toSplit->splitBasicBlock(it, toSplit->getName() + ".split");
 +    }
 +
