@@ -77,6 +77,10 @@ bool Flattening::flatten(Function *f) {
   // Save all original BB
   for (Function::iterator i = f->begin(); i != f->end(); ++i) {
     BasicBlock *tmp = &*i;
+    if (tmp->isEHPad() || tmp->isLandingPad()) {
+      errs()<<f->getName()<<" Contains Exception Handing Instructions and is unsupported for flattening in the open-source version of Hikari.\n";
+      return false;
+    }
     origBB.push_back(tmp);
 
     BasicBlock *bb = &*i;
@@ -103,7 +107,6 @@ bool Flattening::flatten(Function *f) {
     br = cast<BranchInst>(insert->getTerminator());
   }
 
-  BasicBlock *zeroBB = NULL;
   if ((br != NULL && br->isConditional()) ||
       insert->getTerminator()->getNumSuccessors() > 1) {
     BasicBlock::iterator i = insert->end();
@@ -115,10 +118,6 @@ bool Flattening::flatten(Function *f) {
 
     BasicBlock *tmpBB = insert->splitBasicBlock(i, "first");
     origBB.insert(origBB.begin(), tmpBB);
-  }
-  else if (br != NULL && insert->getTerminator()->getNumSuccessors() == 1) {
-    // Record the first BB branch to
-    zeroBB = insert->getTerminator()->getSuccessor(0);
   }
 
   // Remove jump
@@ -171,14 +170,7 @@ bool Flattening::flatten(Function *f) {
     numCase = cast<ConstantInt>(ConstantInt::get(
         switchI->getCondition()->getType(),
         llvm::cryptoutils->scramble32(switchI->getNumCases(), scrambling_key)));
-    if (zeroBB && zeroBB != i) {
-        switchI->addCase(numCase, zeroBB);
-        zeroBB = NULL;
-    }
-    else {
-        switchI->addCase(numCase, i);
-    }
-
+    switchI->addCase(numCase, i);
   }
 
   // Recalculate switchVar
