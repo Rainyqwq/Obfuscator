@@ -22,7 +22,8 @@ If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. macOS, Ubuntu]
- - Version [e.g. 12.3.1, 18.04.6]
+ - Version: [e.g. 12.3.1, 18.04.6]
+ - cflag: [e.g.  -mllvm -fla -mllvm -bcf]
 
 **Souce Code (please complete the following information):**
  - git link: [e.g. https://github.com/apple/llvm-project, https://android.googlesource.com/toolchain/llvm-project]
