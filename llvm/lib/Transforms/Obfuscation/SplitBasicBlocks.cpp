@@ -73,7 +73,6 @@ void SplitBasicBlock::runOnCustomFunction(Function *F) {
 
 void SplitBasicBlock::split(Function *f) {
   std::vector<BasicBlock *> origBB;
-  int splitN = SplitNum;
 
   // Save all basic blocks
   for (Function::iterator I = f->begin(), IE = f->end(); I != IE; ++I) {
@@ -84,6 +83,7 @@ void SplitBasicBlock::split(Function *f) {
                                            IE = origBB.end();
        I != IE; ++I) {
     BasicBlock *curr = *I;
+    int splitN = SplitNum;
 
     // No need to split a 1 inst bb
     // Or ones containing a PHI node
@@ -92,7 +92,7 @@ void SplitBasicBlock::split(Function *f) {
     }
 
     // Check splitN and current BB size
-    if ((size_t)splitN > curr->size()) {
+    if ((size_t)splitN >= curr->size()) {
       splitN = curr->size() - 1;
     }
 
@@ -113,12 +113,13 @@ void SplitBasicBlock::split(Function *f) {
     BasicBlock *toSplit = curr;
     int last = 0;
     for (int i = 0; i < splitN; ++i) {
+      if (toSplit->size() < 2)
+        continue;
       for (int j = 0; j < test[i] - last; ++j) {
         ++it;
       }
       last = test[i];
-      if (toSplit->size() < 2)
-        continue;
+
       toSplit = toSplit->splitBasicBlock(it, toSplit->getName() + ".split");
     }
 
