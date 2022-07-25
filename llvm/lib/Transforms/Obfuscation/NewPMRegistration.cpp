@@ -47,7 +47,7 @@ llvm::PassPluginLibraryInfo getOllvmPluginInfo() {
             //registerVectorizerStartEPCallback这个方法插入需要加-O1的flag不然可能不生效会被跳过
             PB.registerVectorizerStartEPCallback(
               [](llvm::FunctionPassManager &PM,
-                 llvm::PassBuilder::OptimizationLevel Level) {
+                 llvm::OptimizationLevel Level) {
                 PM.addPass(SplitBasicBlockPass());
                 PM.addPass(BogusControlFlowPass());
                 #if LLVM_VERSION_MAJOR >= 9
@@ -59,7 +59,7 @@ llvm::PassPluginLibraryInfo getOllvmPluginInfo() {
               });
             PB.registerPipelineStartEPCallback(
               [](llvm::ModulePassManager &PM,
-                 llvm::PassBuilder::OptimizationLevel Level) {
+                 llvm::OptimizationLevel Level) {
                 PM.addPass(StringObfuscationPass());
               });
           
