@@ -1,2 +1,28 @@
-
-name: Android on: [push] jobs: build: name: NDK-R21e runs-on: ubuntu-18.04 steps: - name: Setup Android NDK R23 uses: nttld/setup-ndk@v1 id: setup-ndk with: ndk-version: r21e add-to-path: false - uses: actions/checkout@v2 - name: build run: | mkdir build && cd build echo ${{ steps.setup-ndk.outputs.ndk-path }} cmake \ -DCMAKE_TOOLCHAIN_FILE=${{ steps.setup-ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake \ -DCMAKE_BUILD_TYPE=Release \ -DANDROID_ABI=armeabi-v7a .. cmake --build . - name: Upload GitHub Actions artifact of vcpkg build uses: actions/upload-artifact@v2 with: name: xxx-android path: ${{ github.workspace }}/build/
+name: Android
+on: [push]
+jobs:
+  build:
+    name: NDK-R21e
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Setup Android NDK R23
+      uses: nttld/setup-ndk@v1
+      id: setup-ndk
+      with:
+        ndk-version: r21e
+        add-to-path: false
+    - uses: actions/checkout@v2
+    - name: build
+      run: |
+        mkdir build && cd build
+        echo ${{ steps.setup-ndk.outputs.ndk-path }}
+        cmake \
+          -DCMAKE_TOOLCHAIN_FILE=${{ steps.setup-ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DANDROID_ABI=armeabi-v7a ..
+        cmake --build .
+    - name: Upload GitHub Actions artifact of vcpkg build
+      uses: actions/upload-artifact@v2
+      with:
+        name: xxx-android
+        path: ${{ github.workspace }}/build/
